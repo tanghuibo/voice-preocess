@@ -1,6 +1,7 @@
 from aip import AipSpeech
-import playsound
 from ffmpy3 import FFmpeg
+import playsound
+import os
 
 
 class VoiceHelp(object):
@@ -10,11 +11,16 @@ class VoiceHelp(object):
 
     __api_client = None
 
-    def __init__(self, app_id, api_key, secret_key):
-        self.__api_client = AipSpeech(app_id, api_key, secret_key)
+    def __init__(self, _app_id, _api_key, _secret_key):
+        self.__api_client = AipSpeech(_app_id, _api_key, _secret_key)
 
     def wav_to_text(self, stream):
-        return self.__api_client.asr(stream, 'amr', 16000, {'lan': 'zh'})
+        """
+        wav 音频转文本
+        :param stream:
+        :return:
+        """
+        return self.__api_client.asr(stream, 'pcm', 16000, {'lan': 'zh'})
 
     def text_to_voice(self, text):
         """
@@ -26,32 +32,33 @@ class VoiceHelp(object):
 
     @staticmethod
     def stream_to_file(stream, path):
-       """
-       保存流到文件
-       :param stream:
-       :param path:
-       :return:
-       """
-       with open(path, 'wb') as f:
-        f.write(stream)
-
-    @staticmethod
-    def mp3_to_wav(mp3_path, wav_path):
-
         """
-        媒体格式转换
-        :param self:
-        :param mp3_path:
-        :param wav_path:
+        保存流到文件
+        :param stream:
+        :param path:
         :return:
         """
-        FFmpeg(inputs={mp3_path: None}, outputs={wav_path: None}).run()
+        if os.path.exists(path):
+            os.remove(path)
+        with open(path, 'wb') as f:
+            f.write(stream)
+
+    @staticmethod
+    def mp3_to_wav(_mp3_path, _wav_path):
+        """
+        媒体格式转换
+        :param _mp3_path:
+        :param _wav_path:
+        :return:
+        """
+        if os.path.exists(_wav_path):
+            os.remove(_wav_path)
+        FFmpeg(inputs={_mp3_path: None}, outputs={_wav_path: None}).run()
 
     @staticmethod
     def play_sound(path):
         """
         播放音频
-        :param self:
         :param path:
         :return:
         """
